@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-surface-bg: #F8FAFC;
+    --color-surface-card: #FFFFFF;
+    --color-surface-border: #E2E8F0;
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+  }
+
+  body {
+    background-color: var(--color-surface-bg);
+    color: var(--color-text-main);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.01em;
+  }
+
+  /* Accessible high-contrast keyboard focus indicators (WCAG 2.2 AA) */
+  :focus-visible {
+    outline: 2px solid #0F172A;
+    outline-offset: 2px;
+  }
+
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Tabular numbers for all monetary, numerical, and ID tables */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -1,0 +1,73 @@
+name: BrandProof AI CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  backend-test:
+    name: Backend Lint and Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Ruff Lint Check
+        run: |
+          ruff check .
+
+      - name: Run Pytest (Unit & Core Workflow Suite)
+        env:
+          ENVIRONMENT: testing
+          SUPABASE_URL: https://mock-ci.supabase.co
+          SUPABASE_ANON_KEY: mock-ci-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: mock-ci-service-role-key
+          DATABASE_URL: sqlite:///:memory:
+          GEMINI_API_KEY: mock-ci-gemini-key
+        run: |
+          pytest -v -m "not postgres"
+
+  frontend-test:
+    name: Frontend Lint, Type Check, and Vitest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type-check
+        run: npm run type-check
+
+      - name: Run Vitest Unit Tests
+        run: npm test -- --run
+
+      - name: Build frontend distribution
+        run: npm run build
